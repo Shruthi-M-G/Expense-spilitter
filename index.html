@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Splitter</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+    h1 { text-align: center; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+    input, button { padding: 8px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
+    button { background: #4CAF50; color: white; cursor: pointer; }
+    button:hover { background: #45a049; }
+    table { width: 100%; margin-top: 15px; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #f2f2f2; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Expense Splitter</h1>
+    <input type="text" id="name" placeholder="Enter Name">
+    <input type="number" id="amount" placeholder="Enter Amount">
+    <button onclick="addExpense()">Add</button>
+
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Amount</th></tr>
+      </thead>
+      <tbody id="expenseTable"></tbody>
+    </table>
+
+    <button onclick="calculateSplit()">Calculate Split</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    let expenses = [];
+
+    function addExpense() {
+      const name = document.getElementById('name').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+
+      if (!name || isNaN(amount) || amount <= 0) {
+        alert("Enter valid name and amount!");
+        return;
+      }
+
+      expenses.push({ name, amount });
+      updateTable();
+      document.getElementById('name').value = '';
+      document.getElementById('amount').value = '';
+    }
+
+    function updateTable() {
+      const table = document.getElementById('expenseTable');
+      table.innerHTML = '';
+      expenses.forEach(e => {
+        table.innerHTML += `<tr><td>${e.name}</td><td>₹${e.amount.toFixed(2)}</td></tr>`;
+      });
+    }
+
+    function calculateSplit() {
+      if (expenses.length === 0) {
+        alert("Add some expenses first!");
+        return;
+      }
+
+      const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+      const perPerson = total / expenses.length;
+
+      let resultText = `Total: ₹${total.toFixed(2)} | Each should pay: ₹${perPerson.toFixed(2)}<br>`;
+      expenses.forEach(e => {
+        let balance = e.amount - perPerson;
+        if (balance > 0) resultText += `${e.name} should receive ₹${balance.toFixed(2)}<br>`;
+        else if (balance < 0) resultText += `${e.name} should pay ₹${Math.abs(balance).toFixed(2)}<br>`;
+        else resultText += `${e.name} is settled.<br>`;
+      });
+
+      document.getElementById('result').innerHTML = resultText;
+    }
+  </script>
+</body>
+</html>
